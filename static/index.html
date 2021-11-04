@@ -142,10 +142,13 @@ function getPosition(e) {
 
 
 function addEntity(entity, data) {
+    function addEntityCallback(data) { 
+        //drawFrame();  
+    }
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
-    
+    sendJSONXMLHTTPRequest("http://127.0.0.1:5000/entity/" + entity, JSON.stringify(data), addEntityCallback)
 }
 
 var counter = 0;
@@ -254,21 +257,34 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'colour':'blue','radius':5});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y,'colour':'red','radius':5});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
-                          'radius':10});
+    addEntityWithoutName({'x':x,'y':y,'colour':'green','radius':5});
 });
 
 
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
+    function updateCallback(otherWorld) { 
+        var changes = false;
+        for(var entity in otherWorld) {
+            if(world[entity] != otherWorld[entity]) {
+                world[entity] = otherWorld[entity];
+                changes = true;
+            }
+        }
+        if(changes){
+            drawNextFrame()
+        }
+    }
+    sendJSONXMLHTTPRequest("http://127.0.0.1:5000/world", "{}", updateCallback)
+    
     drawFrame();
 }
 
