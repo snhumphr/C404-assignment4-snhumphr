@@ -39,7 +39,10 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
             try {
                 if (xhr.status==200) {
                     //XXX: parse some JSON from the request!
+                    var data = xhr.responseText;
+                    var jsonData = JSON.parse(data);
                     //XXX: Pass the data to the callback!
+                    callback(jsonData);
                 }
             } 
             catch(e) {
@@ -50,6 +53,10 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     //XXX: POST to a URL
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
+
+    xhr.open("POST", url)
+    xhr.setRequestHeader("Accept","application/json")
+    xhr.send(objects)
 }
 
 
@@ -138,7 +145,7 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
-
+    
 }
 
 var counter = 0;
